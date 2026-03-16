@@ -27,9 +27,9 @@ const getBooking = async (req, res) => {
 
 const createBooking = async (req, res) => {
   try {
-    const { product, customerName, customerEmail, checkIn, checkOut, totalAmount } = req.body || {};
-    if (!product || !customerName || !customerEmail || !checkIn || !checkOut || !totalAmount)
-      return res.status(400).json({ message: "product, customerName, customerEmail, checkIn, checkOut, totalAmount are required" });
+    const { product, customerName, customerEmail, totalAmount } = req.body || {};
+    if (!product || !customerName || !customerEmail || !totalAmount)
+      return res.status(400).json({ message: "product, customerName, customerEmail, totalAmount are required" });
 
     const prod = await Product.findById(product);
     if (!prod) return res.status(404).json({ message: "Product not found" });
