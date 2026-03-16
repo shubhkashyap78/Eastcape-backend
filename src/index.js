@@ -17,6 +17,12 @@ app.use(cors({
 }));
 app.use(express.json({ limit: "10mb" }));
 
+// Ensure DB connected on every request (Vercel serverless)
+app.use(async (req, res, next) => {
+  await connectDb();
+  next();
+});
+
 app.get("/", (req, res) => {
   res.json({ status: "ok", service: "Eastcape Booking API" });
 });
