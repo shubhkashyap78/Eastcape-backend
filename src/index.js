@@ -21,6 +21,17 @@ app.get("/", (req, res) => {
   res.json({ status: "ok", service: "Eastcape Booking API" });
 });
 
+app.get("/health", async (req, res) => {
+  const mongoose = require("mongoose");
+  const dbState = ["disconnected", "connected", "connecting", "disconnecting"];
+  res.json({
+    status: "ok",
+    db: dbState[mongoose.connection.readyState],
+    mongo_uri_set: !!process.env.MONGO_URI,
+    jwt_set: !!process.env.JWT_SECRET,
+  });
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/newsletter", newsletterRoutes);
