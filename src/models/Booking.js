@@ -9,8 +9,8 @@ const bookingSchema = new mongoose.Schema(
     customerEmail: { type: String, required: true, lowercase: true, trim: true },
     customerPhone: { type: String, default: "" },
     guests: { type: Number, default: 1 },
-    checkIn: { type: Date, required: true },
-    checkOut: { type: Date, required: true },
+    checkIn: { type: Date },
+    checkOut: { type: Date },
     totalAmount: { type: Number, required: true },
     currency: { type: String, default: "USD" },
     status: {

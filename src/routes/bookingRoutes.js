@@ -6,6 +6,9 @@ const { requireDb } = require("../middleware/requireDb");
 
 const router = express.Router();
 
+// Public route — website enquiry (no auth)
+router.post("/enquiry", requireDb, createBooking);
+
 const guard = [requireDb, auth, requireRole(["admin", "staff"])];
 
 router.get("/stats", ...guard, getStats);

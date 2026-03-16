@@ -85,4 +85,27 @@ const updateInventory = async (req, res) => {
   }
 };
 
-module.exports = { listProducts, getProduct, createProduct, updateProduct, deleteProduct, duplicateProduct, updateInventory };
+const listPublicProducts = async (req, res) => {
+  try {
+    const { type, q } = req.query;
+    const filter = { isActive: true, "inventory.stopSales": { $ne: true } };
+    if (type) filter.type = type;
+    if (q) filter.title = { $regex: q, $options: "i" };
+    const products = await Product.find(filter, "title type description tags media basePrice baseCurrency markets inventory").sort({ createdAt: -1 });
+    return res.json(products);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+const getPublicProduct = async (req, res) => {
+  try {
+    const product = await Product.findOne({ _id: req.params.id, isActive: true });
+    if (!product) return res.status(404).json({ message: "Not found" });
+    return res.json(product);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { listProducts, getProduct, createProduct, updateProduct, deleteProduct, duplicateProduct, updateInventory, listPublicProducts, getPublicProduct };
