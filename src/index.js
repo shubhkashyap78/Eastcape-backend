@@ -17,7 +17,7 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || "*",
   credentials: true,
 }));
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "25mb" }));
 app.use(morgan("dev"));
 
 // Ensure DB connected on every request (Vercel serverless)
