@@ -1,5 +1,5 @@
 const express = require("express");
-const { seedAdmin, login, me, createUser, devResetPassword, listUsers } = require("../controllers/authController");
+const { seedAdmin, login, me, createUser, updateUser, devResetPassword, listUsers } = require("../controllers/authController");
 const { auth } = require("../middleware/auth");
 const { requireRole } = require("../middleware/roles");
 const { requireDb } = require("../middleware/requireDb");
@@ -12,5 +12,6 @@ router.post("/dev-reset", requireDb, devResetPassword);
 router.get("/me", auth, me);
 router.post("/users", auth, requireRole(["admin"]), createUser);
 router.get("/users", requireDb, auth, requireRole(["admin"]), listUsers);
+router.put("/users/:id", requireDb, auth, requireRole(["admin"]), updateUser);
 
 module.exports = router;

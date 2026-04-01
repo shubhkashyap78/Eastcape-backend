@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "staff", "partner", "customer"],
       default: "staff",
     },
+    permissions: {
+      type: [String],
+      default: ["overview", "bookings", "enquiries", "hotel", "tour", "package", "vehicle"],
+    },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

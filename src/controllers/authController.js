@@ -5,7 +5,11 @@ const signToken = (user) => {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET is not set");
   const expiresIn = process.env.JWT_EXPIRES_IN || "7d";
-  return jwt.sign({ sub: user._id, role: user.role }, secret, { expiresIn });
+  return jwt.sign(
+    { sub: user._id, role: user.role, permissions: user.role === "admin" ? ["all"] : (user.permissions || []) },
+    secret,
+    { expiresIn }
+  );
 };
 
 const seedAdmin = async (req, res) => {
@@ -45,20 +49,41 @@ const login = async (req, res) => {
 };
 
 const me = async (req, res) => {
-  return res.json({ user: req.user });
+  try {
+    const user = await User.findById(req.user.id || req.user.sub).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.json({ user });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
 };
 
 const createUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body || {};
+    const { name, email, password, role, permissions } = req.body || {};
     if (!name || !email || !password || !role)
       return res.status(400).json({ message: "Name, email, password, and role are required" });
 
     const exists = await User.findOne({ email: email.toLowerCase().trim() });
     if (exists) return res.status(400).json({ message: "Email already exists" });
 
-    const user = await User.create({ name, email, password, role });
-    return res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role });
+    const user = await User.create({ name, email, password, role, permissions: permissions || [] });
+    return res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, permissions: user.permissions });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+const updateUser = async (req, res) => {
+  try {
+    const { permissions, role, isActive } = req.body || {};
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: { ...(permissions !== undefined && { permissions }), ...(role && { role }), ...(isActive !== undefined && { isActive }) } },
+      { new: true }
+    ).select("-password");
+    if (!user) return res.status(404).json({ message: "Not found" });
+    return res.json(user);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -97,4 +122,4 @@ const listUsers = async (req, res) => {
   }
 };
 
-module.exports = { seedAdmin, login, me, createUser, devResetPassword, listUsers };
+module.exports = { seedAdmin, login, me, createUser, updateUser, devResetPassword, listUsers };
