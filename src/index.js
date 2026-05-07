@@ -52,7 +52,13 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || "Internal server error" });
 });
 
-// Connect DB once (Vercel serverless — no app.listen)
+// Connect DB once
 connectDb();
+
+// Start server (local + Railway/Render/VPS)
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
 
 module.exports = app;
